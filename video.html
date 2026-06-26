@@ -27,10 +27,11 @@
         .back-btn:hover {
             color: #e50914;
         }
-        /* Pembungkus Player Video biar Responsif */
+        
+        /* Kontainer Player Video (Rasio 16:9) */
         .player-wrapper {
             position: relative;
-            padding-bottom: 56.25%; /* Rasio 16:9 */
+            padding-bottom: 56.25%;
             height: 0;
             background: #000;
             border-radius: 8px;
@@ -45,8 +46,40 @@
             height: 100%;
             border: 0;
         }
+        
+        /* Wadah Khusus Iklan Banner */
+        .ads-box {
+            margin: 15px 0;
+            text-align: center;
+        }
+        .ads-label {
+            display: block;
+            font-size: 10px;
+            color: #555;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+        }
+
+        /* Tombol Download Menggunakan Smartlink */
+        .download-btn {
+            display: block;
+            text-align: center;
+            background: #25d366;
+            color: #fff;
+            padding: 12px;
+            margin: 15px 0;
+            text-decoration: none;
+            font-weight: bold;
+            border-radius: 6px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+            transition: background 0.2s;
+        }
+        .download-btn:hover {
+            background: #1ebd54;
+        }
+
         .video-details {
-            margin-top: 20px;
+            margin-top: 15px;
             background: #1c1c1c;
             padding: 20px;
             border-radius: 8px;
@@ -65,12 +98,41 @@
 <body>
 
     <div class="container">
+        <!-- Tombol Kembali ke Beranda -->
         <a href="index.html" class="back-btn">⬅️ Kembali ke Beranda</a>
 
+        <!-- IKLAN 1: Banner 468x60 (Tampil di atas player video) -->
+        <div class="ads-box">
+            <span class="ads-label">Advertisement</span>
+            <script>
+                atOptions = {
+                    'key' : '43ad9773fd86da839bee8ab4e2c7e59a',
+                    'format' : 'iframe',
+                    'height' : 60,
+                    'width' : 468,
+                    'params' : {}
+                };
+            </script>
+            <script src="https://recallscarce.com/43ad9773fd86da839bee8ab4e2c7e59a/invoke.js"></script>
+        </div>
+
+        <!-- Tempat Pemutar Video DoodStream -->
         <div class="player-wrapper">
             <iframe id="doodPlayer" src="" allowfullscreen="true" scrolling="no"></iframe>
         </div>
 
+        <!-- IKLAN 2: Smartlink Adsterra (Dijadikan tombol download berhadiah dolar) -->
+        <a href="https://recallscarce.com/v3kcqiddp4?key=87ad6ea5756a400c3db6f37eb09bfa31" target="_blank" class="download-btn">
+            📥 DOWNLOAD / STREAMING CEPAT HD
+        </a>
+
+        <!-- IKLAN 3: Native Banner 4:1 (Tampil di bawah tombol download) -->
+        <div class="ads-box">
+            <script async="async" data-cfasync="false" src="https://recallscarce.com/375de84659fca158d710e463c5f3f1f7/invoke.js"></script>
+            <div id="container-375de84659fca158d710e463c5f3f1f7"></div>
+        </div>
+
+        <!-- Detail Informasi Judul Video -->
         <div class="video-details">
             <h2 id="displayTitle" class="video-title">Memuat judul...</h2>
             <div class="video-meta">
@@ -80,16 +142,16 @@
     </div>
 
     <script>
-        // Fungsi mengambil parameter data dari URL browser (?id=xxxx&title=xxxx)
+        // Mengambil parameter dari URL (?id=xxxx&title=xxxx)
         const urlParams = new URLSearchParams(window.location.search);
         const videoId = urlParams.get('id');
         const videoTitle = urlParams.get('title');
 
         if (videoId) {
-            // Pasang file_code ke embed player DoodStream
+            // Memasukkan id video ke dalam iframe DoodStream
             document.getElementById('doodPlayer').src = `https://doodstream.com/e/${videoId}`;
             
-            // Tampilkan judul video yang diambil dari halaman utama tadi
+            // Memasukkan judul video ke teks halaman
             if (videoTitle) {
                 document.getElementById('displayTitle').innerText = decodeURIComponent(videoTitle);
                 document.title = decodeURIComponent(videoTitle) + " - Nonton Online";
@@ -100,5 +162,14 @@
             document.getElementById('displayTitle').innerText = "Video tidak ditemukan atau link salah.";
         }
     </script>
+
+    <!-- ================= IKLAN GLOBAL HALAMAN NONTON ================= -->
+    <!-- Adsterra Popunder -->
+    <script src="https://recallscarce.com/b6/9d/33/b69d33bf03cfafc4f944b54673468173.js"></script>
+    
+    <!-- Adsterra Social Bar -->
+    <script src="https://recallscarce.com/7c/4a/11/7c4a11f3ccd4bec4536e013d2b6c8732.js"></script>
+    <!-- =============================================================== -->
+
 </body>
 </html>

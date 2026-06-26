@@ -24,7 +24,6 @@
             max-width: 1200px; 
             margin: 0 auto; 
         }
-        /* Mengubah card menjadi tag <a> agar bisa diklik dan pindah halaman */
         .video-card { 
             background: #1c1c1c; 
             border-radius: 8px; 
@@ -68,11 +67,13 @@
 
     <h1>Koleksi Video</h1>
 
+    <!-- Tempat Daftar Video Muncul -->
     <div class="video-grid" id="videoGrid">
         <div class="loading">Memuat video...</div>
     </div>
 
     <script>
+        // Mengambil proxy backend dari folder api/videos.js
         const apiUrl = '/api/videos'; 
 
         fetch(apiUrl)
@@ -87,7 +88,7 @@
                         
                         const card = document.createElement('a');
                         card.className = 'video-card';
-                        // Pindah ke halaman video.html sambil membawa ID dan Judul video lewat URL
+                        // Mengirimkan ID & Judul ke halaman video.html pas di-klik
                         card.href = `video.html?id=${video.file_code}&title=${encodeURIComponent(video.title)}`;
                         card.innerHTML = `
                             <img src="${thumbnail}" alt="${video.title}">
@@ -104,5 +105,14 @@
                 document.getElementById('videoGrid').innerHTML = '<div class="loading">Gagal memuat data dari API.</div>';
             });
     </script>
+
+    <!-- ================= IKLAN GLOBAL BERANDA ================= -->
+    <!-- Adsterra Popunder -->
+    <script src="https://recallscarce.com/b6/9d/33/b69d33bf03cfafc4f944b54673468173.js"></script>
+    
+    <!-- Adsterra Social Bar -->
+    <script src="https://recallscarce.com/7c/4a/11/7c4a11f3ccd4bec4536e013d2b6c8732.js"></script>
+    <!-- ======================================================== -->
+
 </body>
 </html>
