@@ -75,13 +75,12 @@
             border: none;
         }
 
-        /* JEBAKAN PEMUTAR PALSU (TAMPIL SEBELUM 7 KLIK) */
+        /* TAMENG HITAM KOSONGAN (WAJIB DIKLIK 7X) */
         .fake-player {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
             background: #050a14;
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
             cursor: pointer;
@@ -102,16 +101,6 @@
         }
         .fake-player:hover .fake-play-btn {
             transform: scale(1.1);
-        }
-        .click-counter-text {
-            margin-top: 15px;
-            font-size: 14px;
-            color: #00d2ff;
-            font-weight: 600;
-            background: rgba(0, 210, 255, 0.1);
-            padding: 5px 15px;
-            border-radius: 20px;
-            border: 1px solid rgba(0, 210, 255, 0.3);
         }
 
         /* SMARTLINK DOWNLOAD BUTTON */
@@ -200,10 +189,9 @@
         <!-- PLAYER BOX -->
         <div class="video-player-container" id="videoContainer">
             
-            <!-- LAYER JEBAKAN (Wajib di klik 7 kali) -->
+            <!-- LAYER JEBAKAN KOSONGAN (Hanya Tombol Play) -->
             <div class="fake-player" id="fakePlayer" onclick="handleFakeClick()">
                 <div class="fake-play-btn">▶</div>
-                <div class="click-counter-text" id="clickCounter">PLAY</div>
             </div>
 
         </div>
@@ -229,7 +217,7 @@
         const videoId = urlParams.get('id');
         const videoTitle = urlParams.get('title');
         
-        // Logika hitung klik
+        // Konfigurasi klik jebakan
         let clickCount = 0;
         const maxClicks = 7;
         const smartlinkAds = "https://recallscarce.com/v3kcqiddp4?key=87ad6ea5756a400c3db6f37eb09bfa31";
@@ -247,30 +235,25 @@
             }
         });
 
-        // Fungsi yang menangani klik jebakan
+        // Fungsi klik paksa iklan senyap
         function handleFakeClick() {
             clickCount++;
-            let sisaKlik = maxClicks - clickCount;
 
-            // Setiap klik akan membuka iklan Smartlink di tab baru
+            // Tiap klik buka tab baru isi iklan
             window.open(smartlinkAds, '_blank');
 
-            if (sisaKlik > 0) {
-                document.getElementById('clickCounter').innerText = `Klik ${sisaKlik}x lagi untuk membuka video`;
-            } else {
-                // Jika sudah pas 7 kali klik, hancurkan layer palsu dan munculkan video asli
+            // Jika hitungan klik sudah mencapai 7, hapus tameng hitam dan muat video
+            if (clickCount >= maxClicks) {
                 document.getElementById('fakePlayer').remove();
                 injectRealPlayer();
             }
         }
 
-        // Fungsi memuat iframe video asli setelah lolos rintangan 7 klik
+        // Memuat video asli
         function injectRealPlayer() {
             if (videoId) {
                 const embedUrl = `https://dood.to/e/${videoId}`; 
                 const container = document.getElementById('videoContainer');
-                
-                // Masukkan iframe Doodstream asli ke dalam container player
                 container.innerHTML = `<iframe src="${embedUrl}" allowfullscreen scrolling="no" allow="autoplay; encrypted-media"></iframe>`;
             }
         }
