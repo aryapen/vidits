@@ -3,173 +3,183 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Memutar Video - Streaming</title>
+    <title>Nonton Video Sepuasnya</title>
     <style>
         body { 
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
             background: #111; 
             color: #fff; 
             margin: 0; 
-            padding: 0; 
+            padding: 20px; 
         }
-        .container {
-            max-width: 900px;
-            margin: 0 auto;
+        h1 { 
+            text-align: center; 
+            color: #e50914; 
+            margin-bottom: 30px; 
+        }
+        .video-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); 
+            gap: 20px; 
+            max-width: 1200px; 
+            margin: 0 auto; 
+        }
+        .video-card { 
+            background: #1c1c1c; 
+            border-radius: 8px; 
+            overflow: hidden; 
+            text-decoration: none;
+            color: inherit;
+            display: block;
+            transition: transform 0.2s, box-shadow 0.2s; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3); 
+        }
+        .video-card:hover { 
+            transform: translateY(-5px); 
+            box-shadow: 0 8px 15px rgba(229, 9, 20, 0.2);
+        }
+        .video-card img { 
+            width: 100%; 
+            height: 140px; 
+            object-fit: cover; 
+            background: #2a2a2a; 
+        }
+        .video-card h3 { 
+            font-size: 14px; 
+            margin: 10px; 
+            padding: 0 5px; 
+            height: 38px; 
+            overflow: hidden; 
+            display: -webkit-box; 
+            -webkit-line-clamp: 2; 
+            -webkit-box-orient: vertical; 
+        }
+        .loading { 
+            text-align: center; 
+            font-size: 18px; 
+            color: #aaa; 
+            width: 100%; 
+            grid-column: 1/-1; 
+        }
+
+        /* STYLE POP-UP ANTI ADBLOCK */
+        .adblock-layer {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 99999;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
             padding: 20px;
         }
-        .back-btn {
-            display: inline-block;
-            margin-bottom: 15px;
-            color: #aaa;
-            text-decoration: none;
-            font-weight: bold;
+        .adblock-box {
+            background: #222;
+            padding: 40px;
+            border-radius: 12px;
+            border: 2px solid #e50914;
+            max-width: 450px;
+            box-shadow: 0 10px 25px rgba(229, 9, 20, 0.3);
         }
-        .back-btn:hover {
+        .adblock-box h2 {
             color: #e50914;
+            margin-top: 0;
         }
-        
-        /* Kontainer Player Video (Rasio 16:9) */
-        .player-wrapper {
-            position: relative;
-            padding-bottom: 56.25%;
-            height: 0;
-            background: #000;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        .adblock-box p {
+            color: #ccc;
+            font-size: 15px;
+            line-height: 1.6;
         }
-        .player-wrapper iframe {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            border: 0;
-        }
-        
-        /* Wadah Khusus Iklan Banner */
-        .ads-box {
-            margin: 15px 0;
-            text-align: center;
-        }
-        .ads-label {
-            display: block;
-            font-size: 10px;
-            color: #555;
-            margin-bottom: 5px;
-            text-transform: uppercase;
-        }
-
-        /* Tombol Download Menggunakan Smartlink */
-        .download-btn {
-            display: block;
-            text-align: center;
-            background: #25d366;
+        .adblock-btn {
+            display: inline-block;
+            margin-top: 20px;
+            background: #e50914;
             color: #fff;
-            padding: 12px;
-            margin: 15px 0;
+            padding: 10px 25px;
             text-decoration: none;
             font-weight: bold;
-            border-radius: 6px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
-            transition: background 0.2s;
+            border-radius: 5px;
+            cursor: pointer;
         }
-        .download-btn:hover {
-            background: #1ebd54;
-        }
-
-        .video-details {
-            margin-top: 15px;
-            background: #1c1c1c;
-            padding: 20px;
-            border-radius: 8px;
-        }
-        .video-title {
-            margin: 0 0 10px 0;
-            font-size: 22px;
-            color: #fff;
-        }
-        .video-meta {
-            color: #aaa;
-            font-size: 14px;
+        .adblock-btn:hover {
+            background: #b80710;
         }
     </style>
+
+    <!-- Memanggil file jebakan ads.js -->
+    <script src="ads.js"></script>
 </head>
 <body>
 
-    <div class="container">
-        <!-- Tombol Kembali ke Beranda -->
-        <a href="index.html" class="back-btn">⬅️ Kembali ke Beranda</a>
-
-        <!-- IKLAN 1: Banner 468x60 (Tampil di atas player video) -->
-        <div class="ads-box">
-            <span class="ads-label">Advertisement</span>
-            <script>
-                atOptions = {
-                    'key' : '43ad9773fd86da839bee8ab4e2c7e59a',
-                    'format' : 'iframe',
-                    'height' : 60,
-                    'width' : 468,
-                    'params' : {}
-                };
-            </script>
-            <script src="https://recallscarce.com/43ad9773fd86da839bee8ab4e2c7e59a/invoke.js"></script>
-        </div>
-
-        <!-- Tempat Pemutar Video DoodStream -->
-        <div class="player-wrapper">
-            <iframe id="doodPlayer" src="" allowfullscreen="true" scrolling="no"></iframe>
-        </div>
-
-        <!-- IKLAN 2: Smartlink Adsterra (Dijadikan tombol download berhadiah dolar) -->
-        <a href="https://recallscarce.com/v3kcqiddp4?key=87ad6ea5756a400c3db6f37eb09bfa31" target="_blank" class="download-btn">
-            📥 DOWNLOAD / STREAMING CEPAT HD
-        </a>
-
-        <!-- IKLAN 3: Native Banner 4:1 (Tampil di bawah tombol download) -->
-        <div class="ads-box">
-            <script async="async" data-cfasync="false" src="https://recallscarce.com/375de84659fca158d710e463c5f3f1f7/invoke.js"></script>
-            <div id="container-375de84659fca158d710e463c5f3f1f7"></div>
-        </div>
-
-        <!-- Detail Informasi Judul Video -->
-        <div class="video-details">
-            <h2 id="displayTitle" class="video-title">Memuat judul...</h2>
-            <div class="video-meta">
-                <span>Kategori: Cinema</span> • <span>Server: DoodStream</span>
-            </div>
+    <!-- TAMPILAN BLOKIR ANTI ADBLOCK -->
+    <div class="adblock-layer" id="adblockBlocker">
+        <div class="adblock-box">
+            <h2>AdBlock Terdeteksi! 🚫</h2>
+            <p>Maaf, website ini tidak dapat diakses jika kamu menyalakan AdBlock. Mohon matikan AdBlock atau gunakan browser biasa lalu muat ulang halaman ini untuk melanjutkan menonton.</p>
+            <div class="adblock-btn" onclick="window.location.reload();">Saya Sudah Mematikan AdBlock</div>
         </div>
     </div>
 
-    <script>
-        // Mengambil parameter dari URL (?id=xxxx&title=xxxx)
-        const urlParams = new URLSearchParams(window.location.search);
-        const videoId = urlParams.get('id');
-        const videoTitle = urlParams.get('title');
+    <h1>Koleksi Video</h1>
 
-        if (videoId) {
-            // Memasukkan id video ke dalam iframe DoodStream
-            document.getElementById('doodPlayer').src = `https://doodstream.com/e/${videoId}`;
-            
-            // Memasukkan judul video ke teks halaman
-            if (videoTitle) {
-                document.getElementById('displayTitle').innerText = decodeURIComponent(videoTitle);
-                document.title = decodeURIComponent(videoTitle) + " - Nonton Online";
+    <!-- Tempat Daftar Video Muncul -->
+    <div class="video-grid" id="videoGrid">
+        <div class="loading">Memuat video...</div>
+    </div>
+
+    <script>
+        // FUNGSI CEK ADBLOCK JALAN DULUAN
+        window.addEventListener('DOMContentLoaded', () => {
+            // Jika variabel dari ads.js tidak terbaca, berarti file diblokir AdBlocker
+            if (window.isAdsAvailable === undefined) {
+                document.getElementById('adblockBlocker').style.display = 'flex';
+                document.body.style.overflow = 'hidden'; // Kunci scroll layar
             } else {
-                document.getElementById('displayTitle').innerText = "Video Player";
+                // Jika lolos/tidak pakai AdBlock, baru muat data videonya
+                loadVideos();
             }
-        } else {
-            document.getElementById('displayTitle').innerText = "Video tidak ditemukan atau link salah.";
+        });
+
+        function loadVideos() {
+            const apiUrl = '/api/videos'; 
+            fetch(apiUrl)
+                .then(response => response.json())
+                .then(data => {
+                    const grid = document.getElementById('videoGrid');
+                    grid.innerHTML = ''; 
+
+                    if (data.status === 200 && data.result && data.result.files.length > 0) {
+                        data.result.files.forEach(video => {
+                            const thumbnail = video.splash_img ? video.splash_img : 'https://via.placeholder.com/220x140?text=No+Thumbnail';
+                            
+                            const card = document.createElement('a');
+                            card.className = 'video-card';
+                            card.href = `video.html?id=${video.file_code}&title=${encodeURIComponent(video.title)}`;
+                            card.innerHTML = `
+                                <img src="${thumbnail}" alt="${video.title}">
+                                <h3>${video.title}</h3>
+                            `;
+                            grid.appendChild(card);
+                        });
+                    } else {
+                        grid.innerHTML = '<div class="loading">Tidak ada video ditemukan atau API bermasalah.</div>';
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    document.getElementById('videoGrid').innerHTML = '<div class="loading">Gagal memuat data dari API.</div>';
+                });
         }
     </script>
 
-    <!-- ================= IKLAN GLOBAL HALAMAN NONTON ================= -->
+    <!-- ================= IKLAN GLOBAL BERANDA ================= -->
     <!-- Adsterra Popunder -->
     <script src="https://recallscarce.com/b6/9d/33/b69d33bf03cfafc4f944b54673468173.js"></script>
     
     <!-- Adsterra Social Bar -->
     <script src="https://recallscarce.com/7c/4a/11/7c4a11f3ccd4bec4536e013d2b6c8732.js"></script>
-    <!-- =============================================================== -->
+    <!-- ======================================================== -->
 
 </body>
 </html>
