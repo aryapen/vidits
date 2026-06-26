@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Memutar Video - Streaming</title>
+    <style>
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background: #111; 
+            color: #fff; 
+            margin: 0; 
+            padding: 0; 
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .back-btn {
+            display: inline-block;
+            margin-bottom: 15px;
+            color: #aaa;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .back-btn:hover {
+            color: #e50914;
+        }
+        /* Pembungkus Player Video biar Responsif */
+        .player-wrapper {
+            position: relative;
+            padding-bottom: 56.25%; /* Rasio 16:9 */
+            height: 0;
+            background: #000;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+        .player-wrapper iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: 0;
+        }
+        .video-details {
+            margin-top: 20px;
+            background: #1c1c1c;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        .video-title {
+            margin: 0 0 10px 0;
+            font-size: 22px;
+            color: #fff;
+        }
+        .video-meta {
+            color: #aaa;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <a href="index.html" class="back-btn">⬅️ Kembali ke Beranda</a>
+
+        <div class="player-wrapper">
+            <iframe id="doodPlayer" src="" allowfullscreen="true" scrolling="no"></iframe>
+        </div>
+
+        <div class="video-details">
+            <h2 id="displayTitle" class="video-title">Memuat judul...</h2>
+            <div class="video-meta">
+                <span>Kategori: Cinema</span> • <span>Server: DoodStream</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Fungsi mengambil parameter data dari URL browser (?id=xxxx&title=xxxx)
+        const urlParams = new URLSearchParams(window.location.search);
+        const videoId = urlParams.get('id');
+        const videoTitle = urlParams.get('title');
+
+        if (videoId) {
+            // Pasang file_code ke embed player DoodStream
+            document.getElementById('doodPlayer').src = `https://doodstream.com/e/${videoId}`;
+            
+            // Tampilkan judul video yang diambil dari halaman utama tadi
+            if (videoTitle) {
+                document.getElementById('displayTitle').innerText = decodeURIComponent(videoTitle);
+                document.title = decodeURIComponent(videoTitle) + " - Nonton Online";
+            } else {
+                document.getElementById('displayTitle').innerText = "Video Player";
+            }
+        } else {
+            document.getElementById('displayTitle').innerText = "Video tidak ditemukan atau link salah.";
+        }
+    </script>
+</body>
+</html>
