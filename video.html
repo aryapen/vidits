@@ -3,116 +3,141 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nonton Video Sepuasnya</title>
+    <title>Memutar Video - Nonton Video Sepuasnya</title>
     <style>
+        /* --- RESET & BASE STYLES --- */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
         body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            background: #111; 
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+            background: #141414; /* Senada dengan index.html */
             color: #fff; 
-            margin: 0; 
-            padding: 20px; 
-        }
-        h1 { 
-            text-align: center; 
-            color: #e50914; 
-            margin-bottom: 30px; 
-        }
-        .video-grid { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); 
-            gap: 20px; 
-            max-width: 1200px; 
-            margin: 0 auto; 
-        }
-        .video-card { 
-            background: #1c1c1c; 
-            border-radius: 8px; 
-            overflow: hidden; 
-            text-decoration: none;
-            color: inherit;
-            display: block;
-            transition: transform 0.2s, box-shadow 0.2s; 
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3); 
-        }
-        .video-card:hover { 
-            transform: translateY(-5px); 
-            box-shadow: 0 8px 15px rgba(229, 9, 20, 0.2);
-        }
-        .video-card img { 
-            width: 100%; 
-            height: 140px; 
-            object-fit: cover; 
-            background: #2a2a2a; 
-        }
-        .video-card h3 { 
-            font-size: 14px; 
-            margin: 10px; 
-            padding: 0 5px; 
-            height: 38px; 
-            overflow: hidden; 
-            display: -webkit-box; 
-            -webkit-line-clamp: 2; 
-            -webkit-box-orient: vertical; 
-        }
-        .loading { 
-            text-align: center; 
-            font-size: 18px; 
-            color: #aaa; 
-            width: 100%; 
-            grid-column: 1/-1; 
+            padding: 20px 0;
         }
 
-        /* STYLE POP-UP ANTI ADBLOCK */
+        /* --- MAIN CONTAINER --- */
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+
+        /* --- NAVIGASI TOMBOL KEMBALI --- */
+        .nav-box {
+            margin-bottom: 20px;
+        }
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            color: #aaa;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            transition: color 0.2s, transform 0.2s;
+            padding: 8px 0;
+        }
+        .back-btn:hover {
+            color: #e50914;
+            transform: translateX(-4px);
+        }
+        .back-btn svg {
+            margin-right: 8px;
+            fill: currentColor;
+        }
+
+        /* --- THEATER VIDEO WRAPPER (16:9) --- */
+        .video-player-container {
+            position: relative;
+            padding-bottom: 56.25%; /* Golden Ratio 16:9 Cinema */
+            height: 0;
+            background: #000;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 15px rgba(229, 9, 20, 0.1);
+        }
+        .video-player-container iframe {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            border: none;
+        }
+
+        /* --- DETAIL / TEXT VIDEO --- */
+        .video-details {
+            margin-top: 25px;
+            background: #1c1c1c;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #282828;
+        }
+        h2 {
+            font-size: 22px;
+            font-weight: 700;
+            color: #fff;
+            line-height: 1.4;
+            letter-spacing: -0.5px;
+        }
+
+        /* --- POP-UP ANTI ADBLOCK (Penyelarasan Stabilitas) --- */
         .adblock-layer {
             display: none;
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.95);
-            z-index: 99999;
+            background: rgba(10, 10, 10, 0.98);
+            z-index: 999999;
             justify-content: center;
             align-items: center;
             text-align: center;
             padding: 20px;
+            backdrop-filter: blur(8px);
         }
         .adblock-box {
-            background: #222;
-            padding: 40px;
+            background: #181818;
+            padding: 40px 30px;
             border-radius: 12px;
-            border: 2px solid #e50914;
+            border: 1px solid #333;
             max-width: 450px;
-            box-shadow: 0 10px 25px rgba(229, 9, 20, 0.3);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.7);
         }
         .adblock-box h2 {
             color: #e50914;
-            margin-top: 0;
+            font-size: 24px;
+            margin-bottom: 15px;
+            font-weight: 700;
         }
         .adblock-box p {
-            color: #ccc;
-            font-size: 15px;
+            color: #aaa;
+            font-size: 14px;
             line-height: 1.6;
+            margin-bottom: 25px;
         }
         .adblock-btn {
             display: inline-block;
-            margin-top: 20px;
             background: #e50914;
             color: #fff;
-            padding: 10px 25px;
+            padding: 12px 30px;
             text-decoration: none;
-            font-weight: bold;
-            border-radius: 5px;
+            font-weight: 700;
+            font-size: 14px;
+            border-radius: 4px;
             cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
         .adblock-btn:hover {
             background: #b80710;
+            transform: scale(1.02);
         }
     </style>
 
-    <!-- Memanggil file jebakan ads.js -->
     <script src="ads.js"></script>
 </head>
 <body>
 
-    <!-- TAMPILAN BLOKIR ANTI ADBLOCK -->
     <div class="adblock-layer" id="adblockBlocker">
         <div class="adblock-box">
             <h2>AdBlock Terdeteksi! 🚫</h2>
@@ -121,65 +146,59 @@
         </div>
     </div>
 
-    <h1>Koleksi Video</h1>
+    <div class="container">
+        <div class="nav-box">
+            <a href="index.html" class="back-btn">
+                <svg width="16" height="16" viewBox="0 0 24 24"><path d="M16.67 0l2.83 2.829-9.339 9.175 9.339 9.167-2.83 2.829-12.17-11.996z"/></svg>
+                Kembali ke Beranda
+            </a>
+        </div>
+        
+        <div class="video-player-container" id="videoContainer">
+            </div>
 
-    <!-- Tempat Daftar Video Muncul -->
-    <div class="video-grid" id="videoGrid">
-        <div class="loading">Memuat video...</div>
+        <div class="video-details">
+            <h2 id="videoTitle">Memuat judul video...</h2>
+        </div>
     </div>
 
     <script>
-        // FUNGSI CEK ADBLOCK JALAN DULUAN
+        // Mengurai parameter data dari URL (?id=xxxx&title=xxxx)
+        const urlParams = new URLSearchParams(window.location.search);
+        const videoId = urlParams.get('id');
+        const videoTitle = urlParams.get('title');
+
+        // CEK ADBLOCK JALAN DULUAN
         window.addEventListener('DOMContentLoaded', () => {
-            // Jika variabel dari ads.js tidak terbaca, berarti file diblokir AdBlocker
             if (window.isAdsAvailable === undefined) {
                 document.getElementById('adblockBlocker').style.display = 'flex';
-                document.body.style.overflow = 'hidden'; // Kunci scroll layar
+                document.body.style.overflow = 'hidden'; 
             } else {
-                // Jika lolos/tidak pakai AdBlock, baru muat data videonya
-                loadVideos();
+                // Jika lolos AdBlock, jalankan pemutar video
+                initPlayer();
             }
         });
 
-        function loadVideos() {
-            const apiUrl = '/api/videos'; 
-            fetch(apiUrl)
-                .then(response => response.json())
-                .then(data => {
-                    const grid = document.getElementById('videoGrid');
-                    grid.innerHTML = ''; 
-
-                    if (data.status === 200 && data.result && data.result.files.length > 0) {
-                        data.result.files.forEach(video => {
-                            const thumbnail = video.splash_img ? video.splash_img : 'https://via.placeholder.com/220x140?text=No+Thumbnail';
-                            
-                            const card = document.createElement('a');
-                            card.className = 'video-card';
-                            card.href = `video.html?id=${video.file_code}&title=${encodeURIComponent(video.title)}`;
-                            card.innerHTML = `
-                                <img src="${thumbnail}" alt="${video.title}">
-                                <h3>${video.title}</h3>
-                            `;
-                            grid.appendChild(card);
-                        });
-                    } else {
-                        grid.innerHTML = '<div class="loading">Tidak ada video ditemukan atau API bermasalah.</div>';
-                    }
-                })
-                .catch(err => {
-                    console.error(err);
-                    document.getElementById('videoGrid').innerHTML = '<div class="loading">Gagal memuat data dari API.</div>';
-                });
+        function initPlayer() {
+            if (videoId) {
+                // Dekode dan pasang Judul Video asli
+                document.getElementById('videoTitle').innerText = videoTitle ? decodeURIComponent(videoTitle) : "Video Tanpa Judul";
+                
+                // Base Link Embed Doodstream
+                const embedUrl = `https://dood.to/e/${videoId}`; 
+                
+                const container = document.getElementById('videoContainer');
+                // Menginjeksi Iframe Premium Player
+                container.innerHTML = `<iframe src="${embedUrl}" allowfullscreen scrolling="no" allow="autoplay; encrypted-media"></iframe>`;
+            } else {
+                document.getElementById('videoTitle').innerText = "Error: Video ID Tidak Ditemukan!";
+                document.getElementById('videoContainer').innerHTML = '<div style="text-align:center; padding:20% 0; color:#ff3333; font-weight:bold;">Tautan video tidak valid atau telah kadaluarsa.</div>';
+            }
         }
     </script>
 
-    <!-- ================= IKLAN GLOBAL BERANDA ================= -->
-    <!-- Adsterra Popunder -->
     <script src="https://recallscarce.com/b6/9d/33/b69d33bf03cfafc4f944b54673468173.js"></script>
     
-    <!-- Adsterra Social Bar -->
     <script src="https://recallscarce.com/7c/4a/11/7c4a11f3ccd4bec4536e013d2b6c8732.js"></script>
-    <!-- ======================================================== -->
-
-</body>
+    </body>
 </html>
