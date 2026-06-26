@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Memutar Video - Nonton Video Sepuasnya</title>
+    <title>Memutar Video - Vidit</title>
     <style>
-        /* --- RESET & BASE STYLES --- */
         * {
             box-sizing: border-box;
             margin: 0;
@@ -13,34 +12,31 @@
         }
         body { 
             font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
-            background: #141414; /* Senada dengan index.html */
+            background: #0b111e; 
             color: #fff; 
             padding: 20px 0;
         }
 
-        /* --- MAIN CONTAINER --- */
         .container {
             max-width: 900px;
             margin: 0 auto;
             padding: 0 15px;
         }
 
-        /* --- NAVIGASI TOMBOL KEMBALI --- */
         .nav-box {
             margin-bottom: 20px;
         }
         .back-btn {
             display: inline-flex;
             align-items: center;
-            color: #aaa;
+            color: #00d2ff;
             text-decoration: none;
             font-size: 14px;
             font-weight: 600;
-            transition: color 0.2s, transform 0.2s;
+            transition: transform 0.2s;
             padding: 8px 0;
         }
         .back-btn:hover {
-            color: #e50914;
             transform: translateX(-4px);
         }
         .back-btn svg {
@@ -48,15 +44,29 @@
             fill: currentColor;
         }
 
-        /* --- THEATER VIDEO WRAPPER (16:9) --- */
+        /* BANNER CONTAINER */
+        .ads-box {
+            margin: 15px 0;
+            text-align: center;
+        }
+        .ads-label {
+            display: block;
+            font-size: 10px;
+            color: #4a5568;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+        }
+
+        /* PREMIUM BLUE PLAYER WRAPPER */
         .video-player-container {
             position: relative;
-            padding-bottom: 56.25%; /* Golden Ratio 16:9 Cinema */
+            padding-bottom: 56.25%; 
             height: 0;
             background: #000;
             border-radius: 8px;
             overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 15px rgba(229, 9, 20, 0.1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 15px rgba(0, 210, 255, 0.2);
+            border: 1px solid #1e2d4a;
         }
         .video-player-container iframe {
             position: absolute;
@@ -65,28 +75,81 @@
             border: none;
         }
 
-        /* --- DETAIL / TEXT VIDEO --- */
-        .video-details {
-            margin-top: 25px;
-            background: #1c1c1c;
-            padding: 20px;
-            border-radius: 8px;
-            border: 1px solid #282828;
+        /* JEBAKAN PEMUTAR PALSU (TAMPIL SEBELUM 7 KLIK) */
+        .fake-player {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: #050a14;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 10;
         }
-        h2 {
-            font-size: 22px;
-            font-weight: 700;
+        .fake-play-btn {
+            background: rgba(0, 210, 255, 0.9);
+            width: 70px; height: 70px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
             color: #fff;
-            line-height: 1.4;
-            letter-spacing: -0.5px;
+            padding-left: 5px;
+            box-shadow: 0 0 20px rgba(0, 210, 255, 0.5);
+            transition: transform 0.2s;
+        }
+        .fake-player:hover .fake-play-btn {
+            transform: scale(1.1);
+        }
+        .click-counter-text {
+            margin-top: 15px;
+            font-size: 14px;
+            color: #00d2ff;
+            font-weight: 600;
+            background: rgba(0, 210, 255, 0.1);
+            padding: 5px 15px;
+            border-radius: 20px;
+            border: 1px solid rgba(0, 210, 255, 0.3);
         }
 
-        /* --- POP-UP ANTI ADBLOCK (Penyelarasan Stabilitas) --- */
+        /* SMARTLINK DOWNLOAD BUTTON */
+        .download-btn {
+            display: block;
+            text-align: center;
+            background: linear-gradient(135deg, #00d2ff 0%, #0072ff 100%);
+            color: #fff;
+            padding: 14px;
+            margin: 20px 0;
+            text-decoration: none;
+            font-weight: bold;
+            border-radius: 6px;
+            box-shadow: 0 4px 15px rgba(0, 114, 255, 0.4);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 114, 255, 0.6);
+        }
+
+        .video-details {
+            margin-top: 25px;
+            background: #141d30;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #1e2d4a;
+        }
+        h2 { font-size: 22px; font-weight: 700; color: #fff; line-height: 1.4; }
+
+        /* POP-UP ANTI ADBLOCK */
         .adblock-layer {
             display: none;
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(10, 10, 10, 0.98);
+            background: rgba(7, 11, 20, 0.98);
             z-index: 999999;
             justify-content: center;
             align-items: center;
@@ -94,46 +157,11 @@
             padding: 20px;
             backdrop-filter: blur(8px);
         }
-        .adblock-box {
-            background: #181818;
-            padding: 40px 30px;
-            border-radius: 12px;
-            border: 1px solid #333;
-            max-width: 450px;
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.7);
-        }
-        .adblock-box h2 {
-            color: #e50914;
-            font-size: 24px;
-            margin-bottom: 15px;
-            font-weight: 700;
-        }
-        .adblock-box p {
-            color: #aaa;
-            font-size: 14px;
-            line-height: 1.6;
-            margin-bottom: 25px;
-        }
-        .adblock-btn {
-            display: inline-block;
-            background: #e50914;
-            color: #fff;
-            padding: 12px 30px;
-            text-decoration: none;
-            font-weight: 700;
-            font-size: 14px;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: background 0.2s, transform 0.1s;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        .adblock-btn:hover {
-            background: #b80710;
-            transform: scale(1.02);
-        }
+        .adblock-box { background: #141d30; padding: 40px 30px; border-radius: 12px; border: 2px solid #00d2ff; max-width: 450px; }
+        .adblock-box h2 { color: #00d2ff; font-size: 24px; margin-bottom: 15px;}
+        .adblock-box p { color: #a0aec0; font-size: 14px; margin-bottom: 25px;}
+        .adblock-btn { display: inline-block; background: #00d2ff; color: #0b111e; padding: 12px 30px; text-decoration: none; font-weight: 700; border-radius: 4px; cursor: pointer; }
     </style>
-
     <script src="ads.js"></script>
 </head>
 <body>
@@ -141,7 +169,7 @@
     <div class="adblock-layer" id="adblockBlocker">
         <div class="adblock-box">
             <h2>AdBlock Terdeteksi! 🚫</h2>
-            <p>Maaf, website ini tidak dapat diakses jika kamu menyalakan AdBlock. Mohon matikan AdBlock atau gunakan browser biasa lalu muat ulang halaman ini untuk melanjutkan menonton.</p>
+            <p>Mohon matikan AdBlocker di browsermu lalu muat ulang halaman ini untuk melanjutkan streaming di Vidit.</p>
             <div class="adblock-btn" onclick="window.location.reload();">Saya Sudah Mematikan AdBlock</div>
         </div>
     </div>
@@ -153,9 +181,43 @@
                 Kembali ke Beranda
             </a>
         </div>
+
+        <!-- BANNER 468x60 -->
+        <div class="ads-box">
+            <span class="ads-label">Advertisement</span>
+            <script>
+                atOptions = {
+                    'key' : '43ad9773fd86da839bee8ab4e2c7e59a',
+                    'format' : 'iframe',
+                    'height' : 60,
+                    'width' : 468,
+                    'params' : {}
+                };
+            </script>
+            <script src="https://recallscarce.com/43ad9773fd86da839bee8ab4e2c7e59a/invoke.js"></script>
+        </div>
         
+        <!-- PLAYER BOX -->
         <div class="video-player-container" id="videoContainer">
+            
+            <!-- LAYER JEBAKAN (Wajib di klik 7 kali) -->
+            <div class="fake-player" id="fakePlayer" onclick="handleFakeClick()">
+                <div class="fake-play-btn">▶</div>
+                <div class="click-counter-text" id="clickCounter">Klik 7x lagi untuk membuka video</div>
             </div>
+
+        </div>
+
+        <!-- SMARTLINK DOWNLOAD -->
+        <a href="https://recallscarce.com/v3kcqiddp4?key=87ad6ea5756a400c3db6f37eb09bfa31" target="_blank" class="download-btn">
+            📥 DOWNLOAD / STREAMING CEPAT HD
+        </a>
+
+        <!-- NATIVE BANNER 4:1 -->
+        <div class="ads-box">
+            <script async="async" data-cfasync="false" src="https://recallscarce.com/375de84659fca158d710e463c5f3f1f7/invoke.js"></script>
+            <div id="container-375de84659fca158d710e463c5f3f1f7"></div>
+        </div>
 
         <div class="video-details">
             <h2 id="videoTitle">Memuat judul video...</h2>
@@ -163,42 +225,59 @@
     </div>
 
     <script>
-        // Mengurai parameter data dari URL (?id=xxxx&title=xxxx)
         const urlParams = new URLSearchParams(window.location.search);
         const videoId = urlParams.get('id');
         const videoTitle = urlParams.get('title');
+        
+        // Logika hitung klik
+        let clickCount = 0;
+        const maxClicks = 7;
+        const smartlinkAds = "https://recallscarce.com/v3kcqiddp4?key=87ad6ea5756a400c3db6f37eb09bfa31";
 
-        // CEK ADBLOCK JALAN DULUAN
         window.addEventListener('DOMContentLoaded', () => {
             if (window.isAdsAvailable === undefined) {
                 document.getElementById('adblockBlocker').style.display = 'flex';
                 document.body.style.overflow = 'hidden'; 
             } else {
-                // Jika lolos AdBlock, jalankan pemutar video
-                initPlayer();
+                if (videoId) {
+                    document.getElementById('videoTitle').innerText = videoTitle ? decodeURIComponent(videoTitle) : "Video Tanpa Judul";
+                } else {
+                    document.getElementById('videoTitle').innerText = "Error: Video ID Tidak Ditemukan!";
+                }
             }
         });
 
-        function initPlayer() {
-            if (videoId) {
-                // Dekode dan pasang Judul Video asli
-                document.getElementById('videoTitle').innerText = videoTitle ? decodeURIComponent(videoTitle) : "Video Tanpa Judul";
-                
-                // Base Link Embed Doodstream
-                const embedUrl = `https://dood.to/e/${videoId}`; 
-                
-                const container = document.getElementById('videoContainer');
-                // Menginjeksi Iframe Premium Player
-                container.innerHTML = `<iframe src="${embedUrl}" allowfullscreen scrolling="no" allow="autoplay; encrypted-media"></iframe>`;
+        // Fungsi yang menangani klik jebakan
+        function handleFakeClick() {
+            clickCount++;
+            let sisaKlik = maxClicks - clickCount;
+
+            // Setiap klik akan membuka iklan Smartlink di tab baru
+            window.open(smartlinkAds, '_blank');
+
+            if (sisaKlik > 0) {
+                document.getElementById('clickCounter').innerText = `Klik ${sisaKlik}x lagi untuk membuka video`;
             } else {
-                document.getElementById('videoTitle').innerText = "Error: Video ID Tidak Ditemukan!";
-                document.getElementById('videoContainer').innerHTML = '<div style="text-align:center; padding:20% 0; color:#ff3333; font-weight:bold;">Tautan video tidak valid atau telah kadaluarsa.</div>';
+                // Jika sudah pas 7 kali klik, hancurkan layer palsu dan munculkan video asli
+                document.getElementById('fakePlayer').remove();
+                injectRealPlayer();
+            }
+        }
+
+        // Fungsi memuat iframe video asli setelah lolos rintangan 7 klik
+        function injectRealPlayer() {
+            if (videoId) {
+                const embedUrl = `https://dood.to/e/${videoId}`; 
+                const container = document.getElementById('videoContainer');
+                
+                // Masukkan iframe Doodstream asli ke dalam container player
+                container.innerHTML = `<iframe src="${embedUrl}" allowfullscreen scrolling="no" allow="autoplay; encrypted-media"></iframe>`;
             }
         }
     </script>
 
+    <!-- Adsterra Popunder & Social Bar -->
     <script src="https://recallscarce.com/b6/9d/33/b69d33bf03cfafc4f944b54673468173.js"></script>
-    
     <script src="https://recallscarce.com/7c/4a/11/7c4a11f3ccd4bec4536e013d2b6c8732.js"></script>
-    </body>
+</body>
 </html>
