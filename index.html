@@ -5,105 +5,279 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nonton Video Sepuasnya</title>
     <style>
+        /* --- RESET & BASE STYLES --- */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
         body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            background: #111; 
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+            background: #141414; /* Netflix-like dark background */
             color: #fff; 
-            margin: 0; 
-            padding: 20px; 
+            overflow-x: hidden;
+            padding-bottom: 50px;
+        }
+
+        /* --- HEADER --- */
+        header {
+            background: linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, rgba(20,20,20,0) 100%);
+            padding: 30px 20px;
+            text-align: center;
         }
         h1 { 
-            text-align: center; 
+            font-size: 2.5rem;
+            font-weight: 800;
+            letter-spacing: -1px;
             color: #e50914; 
-            margin-bottom: 30px; 
+            text-transform: uppercase;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
         }
+
+        /* --- MAIN CONTAINER --- */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* --- VIDEO GRID UI/UX REVISION --- */
         .video-grid { 
             display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); 
-            gap: 20px; 
-            max-width: 1200px; 
-            margin: 0 auto; 
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); 
+            gap: 25px; 
+            margin-top: 20px;
         }
+        
         .video-card { 
-            background: #1c1c1c; 
-            border-radius: 8px; 
+            background: #181818; 
+            border-radius: 6px; 
             overflow: hidden; 
             text-decoration: none;
             color: inherit;
-            display: block;
-            transition: transform 0.2s, box-shadow 0.2s; 
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3); 
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.3s ease; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5); 
+            cursor: pointer;
+            position: relative;
         }
+        
+        /* Hover Effect premium ala platform streaming */
         .video-card:hover { 
-            transform: translateY(-5px); 
-            box-shadow: 0 8px 15px rgba(229, 9, 20, 0.2);
+            transform: translateY(-8px) scale(1.02); 
+            box-shadow: 0 12px 20px rgba(0, 0, 0, 0.7), 0 0 12px rgba(229, 9, 20, 0.3);
+            background: #242424;
+        }
+
+        /* Thumbnail Wrapper & Ratio 16:9 */
+        .thumbnail-box {
+            position: relative;
+            width: 100%;
+            padding-top: 56.25%; /* Lock 16:9 Aspect Ratio */
+            background: #2a2a2a; 
+            overflow: hidden;
         }
         .video-card img { 
+            position: absolute;
+            top: 0;
+            left: 0;
             width: 100%; 
-            height: 140px; 
+            height: 100%; 
             object-fit: cover; 
-            background: #2a2a2a; 
+            transition: transform 0.5s ease;
+        }
+        .video-card:hover img {
+            transform: scale(1.05);
+        }
+
+        /* Play Button Overlay on Hover */
+        .thumbnail-box::after {
+            content: '▶';
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%) scale(0.8);
+            font-size: 32px;
+            color: #fff;
+            background: rgba(229, 9, 20, 0.85);
+            width: 55px; height: 55px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding-left: 4px;
+            opacity: 0;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 15px rgba(0,0,0,0.5);
+        }
+        .video-card:hover .thumbnail-box::after {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        /* Card Content */
+        .video-info {
+            padding: 15px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
         .video-card h3 { 
             font-size: 14px; 
-            margin: 10px; 
-            padding: 0 5px; 
+            font-weight: 600;
+            line-height: 1.4;
+            color: #e5e5e5;
+            margin: 0;
             height: 38px; 
             overflow: hidden; 
             display: -webkit-box; 
             -webkit-line-clamp: 2; 
             -webkit-box-orient: vertical; 
+            transition: color 0.2s ease;
         }
+        .video-card:hover h3 {
+            color: #fff;
+        }
+
+        /* Loading & Error State */
         .loading { 
             text-align: center; 
-            font-size: 18px; 
+            font-size: 16px; 
             color: #aaa; 
-            width: 100%; 
+            padding: 60px 0;
             grid-column: 1/-1; 
+            font-weight: 500;
+        }
+
+        /* --- POP-UP ANTI ADBLOCK PERBAIKAN STABILITAS --- */
+        .adblock-layer {
+            display: none; /* Default disembunyikan agar tidak menutup layar */
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(10, 10, 10, 0.98);
+            z-index: 999999; /* Ditinggikan agar mutlak di atas */
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+            backdrop-filter: blur(8px); /* Efek blur premium behind modal */
+        }
+        .adblock-box {
+            background: #181818;
+            padding: 40px 30px;
+            border-radius: 12px;
+            border: 1px solid #333;
+            max-width: 450px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.7);
+        }
+        .adblock-box h2 {
+            color: #e50914;
+            font-size: 24px;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+        .adblock-box p {
+            color: #aaa;
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+        .adblock-btn {
+            display: inline-block;
+            background: #e50914;
+            color: #fff;
+            padding: 12px 30px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 14px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .adblock-btn:hover {
+            background: #b80710;
+            transform: scale(1.02);
         }
     </style>
+
+    <!-- Memanggil file jebakan ads.js -->
+    <script src="ads.js"></script>
 </head>
 <body>
 
-    <h1>Koleksi Video</h1>
-
-    <!-- Tempat Daftar Video Muncul -->
-    <div class="video-grid" id="videoGrid">
-        <div class="loading">Memuat video...</div>
+    <!-- TAMPILAN BLOKIR ANTI ADBLOCK -->
+    <div class="adblock-layer" id="adblockBlocker">
+        <div class="adblock-box">
+            <h2>AdBlock Terdeteksi! 🚫</h2>
+            <p>Maaf, website ini tidak dapat diakses jika kamu menyalakan AdBlock. Mohon matikan AdBlock atau gunakan browser biasa lalu muat ulang halaman ini untuk melanjutkan menonton.</p>
+            <div class="adblock-btn" onclick="window.location.reload();">Saya Sudah Mematikan AdBlock</div>
+        </div>
     </div>
 
+    <header>
+        <h1>Koleksi Video</h1>
+    </header>
+
+    <main class="container">
+        <!-- Tempat Daftar Video Muncul -->
+        <div class="video-grid" id="videoGrid">
+            <div class="loading">Memuat daftar video terbaik untukmu...</div>
+        </div>
+    </main>
+
     <script>
-        // Mengambil proxy backend dari folder api/videos.js
-        const apiUrl = '/api/videos'; 
+        // FUNGSI CEK ADBLOCK JALAN DULUAN
+        window.addEventListener('DOMContentLoaded', () => {
+            // Jika variabel dari ads.js tidak terbaca, berarti file diblokir AdBlocker
+            if (window.isAdsAvailable === undefined) {
+                document.getElementById('adblockBlocker').style.display = 'flex';
+                document.body.style.overflow = 'hidden'; // Kunci scroll layar
+            } else {
+                // Jika lolos/tidak pakai AdBlock, baru muat data videonya
+                loadVideos();
+            }
+        });
 
-        fetch(apiUrl)
-            .then(response => response.json())
-            .then(data => {
-                const grid = document.getElementById('videoGrid');
-                grid.innerHTML = ''; 
+        function loadVideos() {
+            const apiUrl = '/api/videos'; 
+            fetch(apiUrl)
+                .then(response => response.json())
+                .then(data => {
+                    const grid = document.getElementById('videoGrid');
+                    grid.innerHTML = ''; 
 
-                if (data.status === 200 && data.result && data.result.files.length > 0) {
-                    data.result.files.forEach(video => {
-                        const thumbnail = video.splash_img ? video.splash_img : 'https://via.placeholder.com/220x140?text=No+Thumbnail';
-                        
-                        const card = document.createElement('a');
-                        card.className = 'video-card';
-                        // Mengirimkan ID & Judul ke halaman video.html pas di-klik
-                        card.href = `video.html?id=${video.file_code}&title=${encodeURIComponent(video.title)}`;
-                        card.innerHTML = `
-                            <img src="${thumbnail}" alt="${video.title}">
-                            <h3>${video.title}</h3>
-                        `;
-                        grid.appendChild(card);
-                    });
-                } else {
-                    grid.innerHTML = '<div class="loading">Tidak ada video ditemukan atau API bermasalah.</div>';
-                }
-            })
-            .catch(err => {
-                console.error(err);
-                document.getElementById('videoGrid').innerHTML = '<div class="loading">Gagal memuat data dari API.</div>';
-            });
+                    if (data.status === 200 && data.result && data.result.files.length > 0) {
+                        data.result.files.forEach(video => {
+                            const thumbnail = video.splash_img ? video.splash_img : 'https://via.placeholder.com/640x360?text=No+Thumbnail';
+                            
+                            const card = document.createElement('a');
+                            card.className = 'video-card';
+                            
+                            // LINK UTAMA MENUJU video.html (Pastikan penulisan file di github video.html huruf kecil semua)
+                            card.href = `video.html?id=${video.file_code}&title=${encodeURIComponent(video.title)}`;
+                            
+                            card.innerHTML = `
+                                <div class="thumbnail-box">
+                                    <img src="${thumbnail}" alt="${video.title}" loading="lazy">
+                                </div>
+                                <div class="video-info">
+                                    <h3>${video.title}</h3>
+                                </div>
+                            `;
+                            grid.appendChild(card);
+                        });
+                    } else {
+                        grid.innerHTML = '<div class="loading">Tidak ada video ditemukan atau API bermasalah.</div>';
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    document.getElementById('videoGrid').innerHTML = '<div class="loading">Gagal memuat data dari API. Silakan refresh halaman.</div>';
+                });
+        }
     </script>
 
     <!-- ================= IKLAN GLOBAL BERANDA ================= -->
