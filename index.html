@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Video DoodStream</title>
+    <style>
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background: #111; 
+            color: #fff; 
+            margin: 0; 
+            padding: 20px; 
+        }
+        h1 { 
+            text-align: center; 
+            color: #e50914; 
+            margin-bottom: 30px; 
+        }
+        
+        /* Grid Layout untuk Katalog Video */
+        .video-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); 
+            gap: 20px; 
+            max-width: 1200px; 
+            margin: 0 auto; 
+        }
+        .video-card { 
+            background: #1c1c1c; 
+            border-radius: 8px; 
+            overflow: hidden; 
+            cursor: pointer; 
+            transition: transform 0.2s; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3); 
+        }
+        .video-card:hover { 
+            transform: translateY(-5px); 
+        }
+        .video-card img { 
+            width: 100%; 
+            height: 140px; 
+            object-fit: cover; 
+            background: #2a2a2a; 
+        }
+        .video-card h3 { 
+            font-size: 14px; 
+            margin: 10px; 
+            padding: 0 5px; 
+            height: 38px; 
+            overflow: hidden; 
+            display: -webkit-box; 
+            -webkit-line-clamp: 2; 
+            -webkit-box-orient: vertical; 
+        }
+        
+        /* Modal Player (Popup Tempat Putar Video) */
+        .modal { 
+            display: none; 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            background: rgba(0,0,0,0.95); 
+            z-index: 1000; 
+            justify-content: center; 
+            align-items: center; 
+        }
+        .modal-content { 
+            width: 90%; 
+            max-width: 800px; 
+            position: relative; 
+        }
+        .responsive-iframe { 
+            position: relative; 
+            padding-bottom: 56.25%; 
+            height: 0; 
+            overflow: hidden; 
+            border-radius: 8px; 
+            background: #000; 
+        }
+        .responsive-iframe iframe { 
+            position: absolute; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            border: 0; 
+        }
+        .close-btn { 
+            position: absolute; 
+            top: -40px; 
+            right: 0; 
+            color: #fff; 
+            font-size: 30px; 
+            cursor: pointer; 
+            background: none; 
+            border: none; 
+        }
+        
+        .loading { 
+            text-align: center; 
+            font-size: 18px; 
+            color: #aaa; 
+            width: 100%; 
+            grid-column: 1/-1; 
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Koleksi Video</h1>
+
+    <div class="video-grid" id="videoGrid">
+        <div class="loading">Memuat video...</div>
+    </div>
+
+    <div class="modal" id="videoModal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closePlayer()">&times;</button>
+            <div class="responsive-iframe">
+                <iframe id="videoPlayer" src="" allowfullscreen="true" scrolling="no"></iframe>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Mengarah ke serverless function Vercel di folder api/videos.js untuk menghindari CORS
+        const apiUrl = '/api/videos'; 
+
+        // Mengambil data video dari backend proxy kita
+        fetch(apiUrl)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Jaringan bermasalah');
+                }
+                return response.json();
+            })
+            .then(data => {
+                const grid = document.getElementById('videoGrid');
+                grid.innerHTML = ''; // Hapus teks loading
+
+                if (data.status === 200 && data.result && data.result.files.length > 0) {
+                    data.result.files.forEach(video => {
+                        // Cek apakah ada splash_img (thumbnail), jika tidak beri gambar default
+                        const thumbnail = video.splash_img ? video.splash_img : 'https://via.placeholder.com/220x140?text=No+Thumbnail';
+                        
+                        // Membuat elemen kartu video secara dinamis
+                        const card = document.createElement('div');
+                        card.className = 'video-card';
+                        card.onclick = () => openPlayer(video.file_code);
+                        card.innerHTML = `
+                            <img src="${thumbnail}" alt="${video.title}">
+                            <h3>${video.title}</h3>
+                        `;
+                        grid.appendChild(card);
+                    });
+                } else {
+                    grid.innerHTML = '<div class="loading">Tidak ada video ditemukan atau API bermasalah.</div>';
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                document.getElementById('videoGrid').innerHTML = '<div class="loading">Gagal memuat data dari API. Pastikan project sudah di-upload ke Vercel.</div>';
+            });
+
+        // Fungsi untuk membuka pemutar video (Popup)
+        function openPlayer(fileCode) {
+            const modal = document.getElementById('videoModal');
+            const player = document.getElementById('videoPlayer');
+            
+            // Mengeset link embed DoodStream berdasarkan file_code video
+            player.src = `https://doodstream.com/e/${fileCode}`;
+            modal.style.display = 'flex';
+        }
+
+        // Fungsi untuk menutup pemutar video
+        function closePlayer() {
+            const modal = document.getElementById('videoModal');
+            const player = document.getElementById('videoPlayer');
+            
+            player.src = ''; // Mengosongkan src agar video berhenti berputar di latar belakang
+            modal.style.display = 'none';
+        }
+    </script>
+</body>
+</html>
